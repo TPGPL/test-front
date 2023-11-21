@@ -10,6 +10,6 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddSingleton(sp => new HttpClient() { BaseAddress = new Uri("http://localhost:8080/") });
 builder.Services.AddSingleton<IOrderService, OrderService>();
 builder.Services.AddSingleton<IClientService, ClientService>();
-
+builder.Services.AddSingleton<IProductService, ProductService>();
 
 await builder.Build().RunAsync();
