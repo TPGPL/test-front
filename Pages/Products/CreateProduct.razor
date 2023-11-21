@@ -1,0 +1,35 @@
+﻿@page "/products/new"
+@inject IProductService service
+@inject NavigationManager manager
+
+<PageTitle>New product</PageTitle>
+
+<h3>Create product</h3>
+
+@if (product is not null)
+{
+    @if (message is not null)
+    {
+        <p class="alert alert-danger">Error: @message</p>
+    }
+
+    <ProductForm product="product" OnValidSubmit="HandleSubmit" />
+}
+
+@code {
+    private Product product = new Product();
+    private String? message = null;
+
+    public async Task HandleSubmit()
+    {
+        var response = await service.CreateProductAsync(product);
+
+        if (!response.Success)
+        {
+            message = response.Message ?? "Failed to create product.";
+            return;
+        }
+
+        manager.NavigateTo("/products");
+    }
+}
