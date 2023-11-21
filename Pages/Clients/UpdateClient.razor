@@ -1,0 +1,59 @@
+﻿@page "/clients/{Id:int}"
+@inject IClientService service
+@inject NavigationManager navManager
+
+<PageTitle>Update client</PageTitle>
+
+<h3>Update client @Id</h3>
+
+@if (client is null)
+{
+    <p>@message</p>
+} else
+{
+    if (updateMessage is not null)
+    {
+        <p class="alert alert-danger">Error: @updateMessage</p>
+    }
+
+    <ClientForm client="client" OnValidSubmit="HandleSubmit" />
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    private Client? client;
+    private String? message = "Loading...";
+    private String? updateMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await service.GetClientAsync(Id);
+
+        if (!response.Success)
+        {
+            message = response.Message ?? "Failed to get client.";
+            return;
+        }
+
+        client = response.Data;
+    }
+
+    public async Task HandleSubmit()
+    {
+        if (client is null)
+        {
+            return;    
+        }
+
+        var response = await service.UpdateClientAsync(Id, client);
+
+        if (!response.Success)
+        {
+            updateMessage = response.Message ?? "Failed to update client.";
+            return;
+        }
+
+        navManager.NavigateTo("/clients");
+    }
+}

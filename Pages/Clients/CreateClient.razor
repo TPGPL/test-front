@@ -1,0 +1,35 @@
+﻿@page "/clients/new"
+@inject IClientService service
+@inject NavigationManager manager
+
+<PageTitle>New client</PageTitle>
+
+<h3>Create client</h3>
+
+@if (client is not null)
+{
+    @if (message is not null)
+    {
+        <p class="alert alert-danger">Error: @message</p>
+    }
+
+    <ClientForm client="client" OnValidSubmit="HandleSubmit" />
+}
+
+@code {
+    private Client client = new Client();
+    private String? message = null;
+
+    public async Task HandleSubmit()
+    {
+        var response = await service.CreateClientAsync(client);
+
+        if (!response.Success)
+        {
+            message = response.Message ?? "Failed to create client.";
+            return;
+        }
+
+        manager.NavigateTo("/clients");
+    }
+}

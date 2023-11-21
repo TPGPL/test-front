@@ -81,7 +81,7 @@ else
 
         if (!response.Success)
         {
-            message = response.Message;
+            message = response.Message ?? "Failed to get clients.";
             return;
         }
 

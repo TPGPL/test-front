@@ -80,7 +80,7 @@ public class ClientService : IClientService
     {
         try
         {
-            var response = await _httpClient.PutAsJsonAsync($"clients/{id}", client);
+            var response = await _httpClient.PatchAsJsonAsync($"clients/{id}", client);
             var result = await response.Content.ReadFromJsonAsync<ServiceResponse<Client>>()
                 ?? new ServiceResponse<Client>() { Success = false, Message = "Failed to read data." };
 
