@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace OrderManagement.Models;
+namespace OrderManagementApp.Models;
 
 public class Product
 {

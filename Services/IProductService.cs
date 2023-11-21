@@ -1,6 +1,6 @@
-﻿using OrderManagement.Models;
+﻿using OrderManagementApp.Models;
 
-namespace OrderManagement.Services;
+namespace OrderManagementApp.Services;
 
 public interface IProductService
 {

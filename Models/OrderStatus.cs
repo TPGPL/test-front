@@ -1,7 +1,7 @@
 ﻿using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
-namespace OrderManagement.Models;
+namespace OrderManagementApp.Models;
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum OrderStatus
