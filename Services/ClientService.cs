@@ -76,11 +76,11 @@ public class ClientService : IClientService
         }
     }
 
-    public async Task<ServiceResponse<Client>> UpdateClientAsync(int id, Client author)
+    public async Task<ServiceResponse<Client>> UpdateClientAsync(int id, Client client)
     {
         try
         {
-            var response = await _httpClient.PutAsJsonAsync($"clients/{id}", author);
+            var response = await _httpClient.PutAsJsonAsync($"clients/{id}", client);
             var result = await response.Content.ReadFromJsonAsync<ServiceResponse<Client>>()
                 ?? new ServiceResponse<Client>() { Success = false, Message = "Failed to read data." };
 
@@ -96,11 +96,11 @@ public class ClientService : IClientService
         }
     }
 
-    public async Task<ServiceResponse<Client>> CreateClientAsync(Client author)
+    public async Task<ServiceResponse<Client>> CreateClientAsync(Client client)
     {
         try
         {
-            var response = await _httpClient.PostAsJsonAsync($"clients", author);
+            var response = await _httpClient.PostAsJsonAsync($"clients", client);
             var result = await response.Content.ReadFromJsonAsync<ServiceResponse<Client>>()
                 ?? new ServiceResponse<Client>() { Success = false, Message = "Failed to read data." };
 
@@ -118,6 +118,11 @@ public class ClientService : IClientService
 
     public async Task DeleteClientAsync(int id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            await _httpClient.DeleteAsync($"clients/{id}");
+        } catch (Exception)
+        {
+        }
     }
 }
