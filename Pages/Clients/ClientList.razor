@@ -1,0 +1,90 @@
+﻿@page "/clients"
+@inject IClientService service
+@inject NavigationManager manager
+
+<PageTitle>Clients</PageTitle>
+
+<h3>Clients</h3>
+
+@if (clients is null)
+{
+    <p>@message</p>
+}
+else
+{
+    <button class="btn btn-primary" @onclick="CreateAction">Create new client</button>
+
+    @if (!clients.Any())
+    {
+        <p>No data to show.</p>
+    }
+    else
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Surname</th>
+                    <th>Email</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var client in clients)
+                {
+                    <tr>
+                        <th>@client.Id</th>
+                        <td>@client.Name</td>
+                        <td>@client.Surname</td>
+                        <td>@client.Email</td>
+                        <td>
+                            <button class="btn btn-primary" @onclick="() => UpdateAction(client.Id)">Update</button>
+                            <button class="btn btn-danger" @onclick="() => DeleteAction(client.Id)">Delete</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+
+@code {
+    private List<Client>? clients = null;
+    private string? message = "Loading...";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetAction();
+    }
+
+    public void UpdateAction(int id)
+    {
+        manager.NavigateTo($"/clients/{id}");
+    }
+
+    public void CreateAction()
+    {
+        manager.NavigateTo("/clients/new");
+    }
+
+    public async Task DeleteAction(int id)
+    {
+        await service.DeleteClientAsync(id);
+        await GetAction();
+    }
+
+    protected async Task GetAction()
+    {
+        var response = await service.GetClientsAsync();
+
+        if (!response.Success)
+        {
+            message = response.Message;
+            return;
+        }
+
+        clients = response.Data;
+    }
+}
