@@ -9,7 +9,7 @@ public interface IOrderService
     Task<ServiceResponse<Order>> CreateOrderAsync(Order order);
     Task<ServiceResponse<Order>> UpdateOrderAsync(int id, Order order);
     Task DeleteOrderAsync(int id);
-    Task CancelOrderAsync(int id);
-    Task SubmitOrderAsync(int id);
-    Task CompleteOrderAsync(int id);
+    Task<ServiceResponse<Order>> CancelOrderAsync(int id);
+    Task<ServiceResponse<Order>> SubmitOrderAsync(int id);
+    Task<ServiceResponse<Order>> CompleteOrderAsync(int id);
 }
