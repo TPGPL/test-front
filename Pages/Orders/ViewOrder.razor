@@ -1,0 +1,146 @@
+﻿@page "/orders/{Id:int}"
+@inject IOrderService service
+
+<h3>Order @Id</h3>
+
+@if (order is null)
+{
+    <p>@message</p>
+}
+else
+{
+    @if (errorMessage is not null)
+    {
+        <p class="alert alert-danger">Error: @errorMessage</p>
+    }
+
+    <div class="row mt-4">
+        <div class="col col-lg-2">
+            <p><strong>Status</strong></p>
+            <p>@order.Status</p>
+        </div>
+        <div class="col col-lg-2">
+            <p><strong>Client ID</strong></p>
+            <p>@order.ClientId</p>
+        </div>
+        <div class="col col-lg-2">
+            <p><strong>Product quantity</strong></p>
+            <p>@order.Lines.Sum(x => x.Quantity)</p>
+        </div>
+        <div class="col col-lg-2">
+            <p><strong>Total value</strong></p>
+            <p>@Math.Round(order.Lines.Sum(x => x.Quantity * x.Price), 2)</p>
+        </div>
+        <div class="col col-lg-2">
+            @switch (order.Status)
+            {
+                case OrderStatus.New:
+                    <button class="btn btn-primary" @onclick="SubmitAction">Submit</button>
+                    break;
+                case OrderStatus.InProgress:
+                    <button class="btn btn-primary" @onclick="CancelAction">Cancel</button>
+                    <button class="btn btn-primary" @onclick="CompleteAction">Complete</button>
+                    break;
+                default:
+                    break;
+            }
+        </div>
+    </div>
+
+    <div class="mt-5">
+        <h5>Order lines</h5>
+
+        @if (order.Lines.Any())
+        {
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Product ID</th>
+                        <th>Quantity</th>
+                        <th>Unit price</th>
+                        <th>Total value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var line in order.Lines)
+                    {
+                        <tr>
+                            <td>@line.ProductId</td>
+                            <td>@line.Quantity</td>
+                            <td>@line.Price</td>
+                            <td>@Math.Round(line.Quantity * line.Price, 2)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>The order is empty.</p>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    private Order? order;
+    private string message = "Loading...";
+    private string? errorMessage = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetAction();
+    }
+
+    private async Task GetAction()
+    {
+        var response = await service.GetOrderAsync(Id);
+
+        if (!response.Success)
+        {
+            message = response.Message ?? $"Failed to get order with ID {Id}";
+            return;
+        }
+
+        order = response.Data;
+    }
+
+    public async Task SubmitAction() {
+        var response = await service.SubmitOrderAsync(Id);
+
+        if (!response.Success)
+        {
+            errorMessage = response.Message ?? "Failed to submit order.";
+            return;
+        }
+
+        await GetAction();
+    }
+
+    public async Task CancelAction()
+    {
+        var response = await service.CancelOrderAsync(Id);
+
+        if (!response.Success)
+        {
+            errorMessage = response.Message ?? "Failed to cancel order.";
+            return;
+        }
+
+        await GetAction();
+    }
+
+    public async Task CompleteAction()
+    {
+        var response = await service.CompleteOrderAsync(Id);
+
+        if (!response.Success)
+        {
+            errorMessage = response.Message ?? "Failed to complete order.";
+            return;
+        }
+
+        await GetAction();
+    }
+}

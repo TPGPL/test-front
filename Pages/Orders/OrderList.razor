@@ -1,0 +1,104 @@
+﻿@page "/orders"
+@inject IOrderService service
+@inject NavigationManager manager
+
+<PageTitle>Orders</PageTitle>
+
+<h3>Orders</h3>
+
+@if (orders is null)
+{
+    <p>@message</p>
+}
+else
+{
+    <button class="btn btn-primary" @onclick="CreateAction">Create new order</button>
+
+    @if (!orders.Any())
+    {
+        <p>No data to show.</p>
+    }
+    else
+    {
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Client ID</th>
+                    <th>Status</th>
+                    <th>Product quantity</th>
+                    <th>Total value</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in orders)
+                {
+                    <tr>
+                        <th>@order.Id</th>
+                        <td>@order.ClientId</td>
+                        <td>@order.Status</td>
+                        <td>@order.Lines.Sum(x => x.Quantity)</td>
+                        <td>@Math.Round(order.Lines.Sum(x => x.Quantity * x.Price), 2)</td>
+                        <td>
+                            <button class="btn btn-primary" @onclick="() => ViewAction(order.Id)">View</button>
+                            @if (order.Status == OrderStatus.New)
+                            {
+                                <button class="btn btn-secondary" @onclick="() => UpdateAction(order.Id)">Update</button>
+                            }
+                            @if (order.Status != OrderStatus.InProgress)
+                            {
+                                <button class="btn btn-danger" @onclick="() => DeleteAction(order.Id)">Delete</button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+}
+
+
+@code {
+    private List<Order>? orders = null;
+    private string? message = "Loading...";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetAction();
+    }
+
+    public void UpdateAction(int id)
+    {
+        manager.NavigateTo($"/orders/update/{id}");
+    }
+
+    public void CreateAction()
+    {
+        manager.NavigateTo("/orders/new");
+    }
+
+    public async Task DeleteAction(int id)
+    {
+        await service.DeleteOrderAsync(id);
+        await GetAction();
+    }
+
+    protected async Task GetAction()
+    {
+        var response = await service.GetOrdersAsync();
+
+        if (!response.Success)
+        {
+            message = response.Message ?? "Failed to get orders.";
+            return;
+        }
+
+        orders = response.Data;
+    }
+
+    public void ViewAction(int id)
+    {
+        manager.NavigateTo($"/orders/{id}");
+    }
+}
