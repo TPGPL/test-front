@@ -1,6 +1,8 @@
 ﻿@page "/orders/{Id:int}"
 @inject IOrderService service
 
+<PageTitle>Order @Id</PageTitle>
+
 <h3>Order @Id</h3>
 
 @if (order is null)
