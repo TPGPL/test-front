@@ -10,4 +10,6 @@ public class OrderLine
     public int ProductId { get; set; }
     [JsonPropertyName("quantity")]
     public int Quantity { get; set; }
+    [JsonPropertyName("price")]
+    public double Price { get; set; }
 }
